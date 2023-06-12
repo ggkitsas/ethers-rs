@@ -85,6 +85,11 @@ pub struct Block<TX> {
     #[serde(rename = "baseFeePerGas")]
     pub base_fee_per_gas: Option<U256>,
 
+    /// Withdrawals root hash (if past Shanghai)
+    #[serde(default, skip_serializing_if = "Option::is_none", rename = "withdrawalsRoot")]
+    #[cfg(not(feature = "celo"))]
+    pub withdrawals_root: Option<H256>,
+
     #[cfg(feature = "celo")]
     #[cfg_attr(docsrs, doc(cfg(feature = "celo")))]
     /// The block's randomness
@@ -218,6 +223,7 @@ impl Block<TxHash> {
                 mix_hash,
                 nonce,
                 base_fee_per_gas,
+                withdrawals_root,
                 other,
                 ..
             } = self;
@@ -243,6 +249,7 @@ impl Block<TxHash> {
                 mix_hash,
                 nonce,
                 base_fee_per_gas,
+                withdrawals_root,
                 transactions,
                 other,
             }
@@ -322,6 +329,7 @@ impl From<Block<Transaction>> for Block<TxHash> {
                 mix_hash,
                 nonce,
                 base_fee_per_gas,
+                withdrawals_root,
                 other,
             } = full;
             Block {
@@ -346,6 +354,7 @@ impl From<Block<Transaction>> for Block<TxHash> {
                 mix_hash,
                 nonce,
                 base_fee_per_gas,
+                withdrawals_root,
                 transactions: transactions.iter().map(|tx| tx.hash).collect(),
                 other,
             }
